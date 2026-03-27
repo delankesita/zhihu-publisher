@@ -1,0 +1,80 @@
+# Zhihu Publisher 配置文件
+# 复制此文件到 ~/.config/zhihu-publisher/config.yaml
+
+# 知乎配置
+zhihu:
+  # Cookie（必需）
+  # 获取方法：登录知乎 -> F12 -> Network -> 复制 Cookie
+  cookie: "${ZHIHU_COOKIE}"
+  
+  # 默认专栏 ID（可选）
+  # 从专栏页面 URL 获取，如 https://zhuanlan.zhihu.com/c_123456
+  default_column: ""
+  
+  # 请求超时（秒）
+  timeout: 30
+
+# 图片生成配置
+image:
+  # 提供商: doubao | openai
+  provider: "doubao"
+  
+  # API Key
+  # doubao: https://console.volcengine.com/ark
+  # openai: https://platform.openai.com/api-keys
+  api_key: "${DOUBAO_API_KEY}"
+  
+  # API Base URL（可选）
+  # doubao 默认: https://ark.cn-beijing.volces.com/api/v3
+  # openai 默认: https://api.openai.com/v1
+  base_url: ""
+
+# 热点抓取配置
+hotspots:
+  # 数据源
+  sources:
+    - weibo      # 微博热搜
+    - toutiao    # 今日头条
+    - baidu      # 百度热搜
+    - douyin     # 抖音热点（可选）
+  
+  # 每个平台的最大抓取数
+  limit: 30
+  
+  # 是否去重
+  deduplicate: true
+
+# 自动写作配置
+auto_writer:
+  # 文章字数范围
+  min_words: 1500
+  max_words: 2500
+  
+  # 写作风格
+  # 可选: 干货型 | 故事型 | 情绪型 | 热点型 | 测评型
+  style: "热点型"
+  
+  # 默认输出目录
+  output_dir: "./output"
+
+# 发布配置
+publish:
+  # 是否默认保存为草稿
+  draft: false
+  
+  # 是否允许评论
+  can_comment: true
+  
+  # 是否自动生成封面
+  auto_cover: true
+  
+  # 发布后是否等待审核
+  wait_for_review: false
+
+# 日志配置
+logging:
+  # 日志级别: DEBUG | INFO | WARNING | ERROR
+  level: "INFO"
+  
+  # 日志文件路径（留空则不保存文件）
+  file: ""

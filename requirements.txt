@@ -1,3 +1,12 @@
+# Zhihu Publisher - 知乎文章自动发布工具
+
 requests>=2.28.0
 pillow>=9.0.0
-markdown>=3.4.0
+
+# 可选依赖
+pyyaml>=6.0  # YAML 配置文件支持
+
+# 开发依赖
+pytest>=7.0.0
+black>=23.0.0
+flake8>=6.0.0
