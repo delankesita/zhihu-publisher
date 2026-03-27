@@ -1,63 +1,87 @@
 ---
-name: zhihu-publisher
+name: zhihu-auto-publish
 description: |
-  【知乎文章自动发布】整合微信公众号内容，自动发布到知乎专栏。
+  【知乎全自动写作发布】从热点选题 → 文章生成 → 发布知乎，一条龙全自动。
   
-  **触发词**：知乎、发布知乎、推送到知乎、知乎专栏、同步知乎
+  **触发词**：写知乎、发布知乎、知乎文章、知乎专栏、同步知乎
   
-  支持功能：从公众号文章同步、Markdown 转换、图片上传、封面设置。
-version: 1.0.0
+  **⚠️ 重要：必须执行 exec_shell 命令，禁止生成代码**
+version: 2.0.0
 author: OpenClaw
-tags: [zhihu, publishing, wechat, sync]
+tags: [zhihu, publishing, automation, wewrite]
 ---
 
-# 知乎文章自动发布技能
+# 知乎全自动写作发布
 
-## 功能特点
+## 一键执行
 
-- ✅ 从微信公众号同步文章到知乎
-- ✅ Markdown 自动转换为知乎格式
-- ✅ 图片自动上传到知乎图床
-- ✅ 支持草稿/直接发布模式
-
-## 安装依赖
+当用户说"写一篇知乎文章"时，直接执行：
 
 ```bash
-pip install requests pillow markdown
-```
-
-## 配置
-
-```bash
-mkdir -p ~/.config/zhihu-publisher
-cat > ~/.config/zhihu-publisher/.env << 'EOF'
-ZHIHU_COOKIE=your_cookie_here
-EOF
-chmod 600 ~/.config/zhihu-publisher/.env
-```
-
-## 使用方法
-
-### 发布文章
-
-```bash
-python /workspace/projects/workspace/skills/zhihu-publisher/publish.py article.md
-```
-
-### 从公众号同步
-
-```bash
-# 同步 wewrite 输出的文章到知乎
-python /workspace/projects/workspace/skills/zhihu-publisher/publish.py /workspace/projects/workspace/skills/wewrite-toolkit/output/yinfu/*.md
+cd /workspace/projects/workspace/skills/zhihu-publisher && python3 auto_publish.py --topic "用户指定的主题（可选）"
 ```
 
 ## 完整流程
 
-1. 在公众号写文章 → wewrite 推送草稿箱
-2. 同一篇文章 → zhihu-publisher 发布到知乎
-3. 实现一稿多平台发布
+### Step 1: 抓热点
 
-## 相关技能
+```bash
+cd /workspace/projects/workspace/skills/wewrite-toolkit && python3 scripts/fetch_hotspots.py --limit 30
+```
 
-- `wewrite`: 微信公众号文章发布
-- `feedgrab`: 多平台内容抓取
+输出：30 个热点（微博 + 头条 + 百度）
+
+### Step 2: 选主题
+
+从热点中选择与用户领域相关的主题，或用户指定主题。
+
+### Step 3: 写文章
+
+用 wewrite 的写作规范生成文章：
+- 1500-2500 字
+- 去 AI 痕迹
+- 金句 + 案例支撑
+
+### Step 4: 生成封面
+
+```bash
+cd /workspace/projects/workspace/skills/wewrite-toolkit && python3 toolkit/image_gen.py --prompt "封面描述" --output /workspace/projects/workspace/skills/zhihu-publisher/output/cover.png --size cover
+```
+
+### Step 5: 发布知乎
+
+```bash
+cd /workspace/projects/workspace/skills/zhihu-publisher && python3 publish.py output/article.md --cover output/cover.png
+```
+
+## 已配置账号
+
+- 知乎专栏：需配置 Cookie（首次使用需登录获取）
+
+## 输出目录
+
+```
+/workspace/projects/workspace/skills/zhihu-publisher/output/
+├── article.md    # 生成的文章
+├── cover.png     # 封面图
+└── images/       # 内文配图
+```
+
+## 配置知乎 Cookie
+
+```bash
+mkdir -p ~/.config/zhihu-publisher
+echo 'ZHIHU_COOKIE=your_cookie_here' > ~/.config/zhihu-publisher/.env
+```
+
+获取方法：登录知乎 → F12 → Network → 复制 Cookie
+
+## 同时发布公众号 + 知乎
+
+```bash
+# 发布到公众号
+cd /workspace/projects/workspace/skills/wewrite-toolkit && python3 toolkit/cli.py publish output/yinfu/article.md --cover output/yinfu/cover.png
+
+# 同一篇文章发布到知乎
+cd /workspace/projects/workspace/skills/zhihu-publisher && python3 publish.py output/article.md
+```
